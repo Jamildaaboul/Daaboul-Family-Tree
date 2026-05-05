@@ -111,8 +111,41 @@ function toggleDark(){darkMode=!darkMode;document.body.classList.toggle("dark-mo
 (function(){if(localStorage.getItem("darkMode")==="1"){darkMode=true;document.body.classList.add("dark-mode");document.querySelector(".btn-dark").textContent="☀️"}})();
 function exportAsImage(){if(!MT){st("Nothing to export!");return}st("Rendering image...");html2canvas(document.getElementById("tw"),{backgroundColor:null,scale:2}).then(function(canvas){var link=document.createElement("a");link.download="daaboul-family-tree.png";link.href=canvas.toDataURL("image/png");link.click();st("Image downloaded!")}).catch(function(){st("Failed. Try a different browser.")})}
 function ls(){var s=localStorage.getItem("dtvfinal5");if(s){try{MT=JSON.parse(s);FT=MT;isF=!1;z=1;tX=0;tY=0;document.getElementById("btnBack").style.display="none";document.getElementById("backNav").classList.remove("show");document.getElementById("titleBox").querySelector(".family-title").textContent="✦ The Daaboul Family Tree ✦";render()}catch(e){createDefault()}}else{createDefault()}}
-function createDefault(){MT={id:"root",person1:{name:"Jamil Daaboul",dob:"1925-05-10",dod:"1998-03-20",gender:"male",photo:null,notes:""},person2:{name:"Nazira Daaboul",dob:"1928-03-15",dod:"2005-11-08",gender:"female",photo:null,notes:""},children:[],marriageDate:"1950-06-15"};FT=MT;isF=!1;z=1;tX=0;tY=0;render();ss()}
-function ss(){localStorage.setItem("dtvfinal5",JSON.stringify(MT))}
+function createDefault(){
+    MT = {
+        id: "root",
+        person1: {name:"Jamil Daaboul", dob:"1925-05-10", dod:"1998-03-20", gender:"male", photo:null, notes:""},
+        person2: {name:"Nazira Daaboul", dob:"1928-03-15", dod:"2005-11-08", gender:"female", photo:null, notes:""},
+        marriageDate: "1950-06-15",
+        children: [
+            {
+                id: gid(),
+                person1: {name:"Joseph Daaboul", dob:"1950-01-01", dod:"2010-07-15", gender:"male", photo:null, notes:"Doctor"},
+                person2: {name:"Marie Daaboul", dob:"1952-06-20", gender:"female", photo:null, notes:"Teacher"},
+                marriageDate: "1972-04-10",
+                children: [
+                    { id: gid(), person1: {name:"Paul Daaboul", dob:"1975-03-10", gender:"male", photo:null, notes:"Engineer"}, person2: null, children: [], marriageDate: "" },
+                    { id: gid(), person1: {name:"Rita Daaboul", dob:"1978-08-22", gender:"female", photo:null, notes:"Artist"}, person2: null, children: [], marriageDate: "" }
+                ]
+            },
+            {
+                id: gid(),
+                person1: {name:"Maurice Daaboul", dob:"1955-08-12", gender:"male", photo:null, notes:"Businessman"},
+                person2: null, children: [], marriageDate: ""
+            },
+            {
+                id: gid(),
+                person1: {name:"Samira Daaboul", dob:"1958-02-28", dod:"2020-01-10", gender:"female", photo:null, notes:"Grandmother"},
+                person2: null, children: [], marriageDate: ""
+            }
+        ]
+    };
+    FT = MT;
+    isF = false;
+    z = 1; tX = 0; tY = 0;
+    render();
+    ss(); // save to localStorage
+}function ss(){localStorage.setItem("dtvfinal5",JSON.stringify(MT))}
 function st(m){var t=document.getElementById("toast");t.textContent=m;t.className="toast show";setTimeout(function(){t.className="toast"},2000)}
 function gid(){return"id_"+Date.now()+"_"+Math.random().toString(36).substr(2,9)}
 function age(dob,dod){if(!dob)return null;var b=new Date(dob+"T00:00:00"),e=dod?new Date(dod+"T00:00:00"):new Date();var a=e.getFullYear()-b.getFullYear();var m=e.getMonth()-b.getMonth();if(m<0||(m===0&&e.getDate()<b.getDate()))a--;return a}
