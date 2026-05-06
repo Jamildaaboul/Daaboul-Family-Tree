@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>The Daaboul Family Tree</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;transition:all 0.3s ease}
+        :root{--bg1:#667eea;--bg2:#764ba2;--header-bg:#dcdcdc;--card-bg:rgba(255,255,255,0.95);--text:#333;--text-light:#666;--modal-bg:#fff;--toast-bg:#333;--toast-color:#fff;--line-color:#888}
+        .dark-mode{--bg1:#1a1a2e;--bg2:#16213e;--header-bg:#0f3460;--card-bg:rgba(30,30,50,0.95);--text:#e0e0e0;--text-light:#aaa;--modal-bg:#1e1e3e;--toast-bg:#e0e0e0;--toast-color:#333;--line-color:#aaa}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));min-height:100vh;overflow:hidden}
+        .header{background:var(--header-bg);padding:8px 15px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px;box-shadow:0 4px 20px rgba(0,0,0,0.2);position:sticky;top:0;z-index:100;border-bottom:3px solid rgba(0,0,0,0.2)}
+        .header-left{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+        .btn-back,.back-nav{z-index:200!important;position:relative}
+        .header button{padding:6px 10px;border:none;border-radius:6px;cursor:pointer;font-size:10px;font-weight:600;color:#fff}
+        .header button:hover:not(:disabled){opacity:0.85;transform:translateY(-1px)}
+        .header button:disabled{opacity:0.5;cursor:not-allowed}
+        .btn-add{background:#4CAF50}.btn-demo{background:#2196F3}.btn-export{background:#FF9800}.btn-import{background:#9C27B0}.btn-clear{background:#f44336}.btn-lock{background:#333}.btn-dark{background:#555}.btn-img{background:#00BCD4}
+        .btn-back{background:#FF5722;display:none}.btn-home{background:#8e44ad}
+        .lock-indicator{font-size:10px;margin-left:4px;padding:2px 6px;border-radius:10px;background:#fff;color:#333}
+        .title-box{background:#1a1a1a;padding:12px 30px;border-radius:30px;text-align:center;border:2px solid #d4af37}
+        .family-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;font-style:italic;color:#fff;letter-spacing:3px}
+        .family-subtitle{font-family:'Aref Ruqaa',serif;font-size:32px;font-weight:700;color:#d4af37;direction:rtl;margin-top:2px}
+        .color-palette{display:flex;gap:4px;background:rgba(255,255,255,0.7);padding:4px 8px;border-radius:15px}
+        .color-dot{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+        .color-dot:hover{transform:scale(1.2)}.color-dot.active{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.5)}
+        .tree-wrapper{width:100vw;height:calc(100vh - 90px);overflow:hidden;cursor:grab;position:relative;touch-action:none}
+        .tree-wrapper:active{cursor:grabbing}
+        .tree-container{position:absolute;padding:30px;transform-origin:0 0}
+        .family-unit{display:flex;flex-direction:column;align-items:center}
+        .couple-row,.single-row{display:flex;align-items:center;gap:10px;background:var(--card-bg);padding:10px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+        .person-card{text-align:center;padding:10px;border-radius:10px;min-width:110px;position:relative;cursor:pointer;border:4px solid #FFD700;color:var(--text)}
+        .person-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.2)}
+        .person-card.male{background:linear-gradient(135deg,#e3f2fd,#bbdefb)}.person-card.female{background:linear-gradient(135deg,#fce4ec,#f8bbd0)}
+        .photo-container{width:60px;height:60px;border-radius:50%;margin:0 auto 5px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#f0f0f0;border:4px solid #FFD700;cursor:pointer}
+        .photo-container img{width:100%;height:100%;object-fit:cover}.photo-container .no-photo{font-size:22px;opacity:0.4}
+        .person-card .name{font-weight:700;font-size:13px;color:var(--text)}.person-card .dates{font-size:9px;color:var(--text-light)}
+        .person-card .actions{position:absolute;top:-8px;right:-8px;display:none;gap:3px;z-index:10}
+        .person-card:hover .actions{display:flex}
+        .person-card .actions button{width:20px;height:20px;border-radius:50%;border:2px solid #fff;cursor:pointer;font-size:10px;background:#fff}
+        .children-section{display:flex;flex-direction:column;align-items:center;margin-top:6px}
+        .children-connector{width:2px;height:28px;background:var(--line-color);border-radius:0}
+        .children-row{display:flex;gap:12px;position:relative;padding-top:28px}
+        .children-row::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--line-color);border-radius:0}
+        .child-wrapper{position:relative}.child-wrapper::before{content:'';position:absolute;top:-28px;left:50%;width:2px;height:28px;background:var(--line-color);border-radius:0}
+        .add-btn{width:30px;height:30px;border-radius:50%;border:2px dashed #bbb;background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:#999;margin:4px}
+        .add-btn:hover{border-color:#4CAF50;color:#4CAF50;background:#f0f9f0;transform:scale(1.15)}
+        .spouse-connector{font-size:16px;text-align:center}
+        .gender-badge{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+        .gender-badge.male{background:#2196F3}.gender-badge.female{background:#e91e63}
+        .deceased-badge{position:absolute;top:3px;right:3px;font-size:12px}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center}
+        .modal.active{display:flex}.modal-content{background:var(--modal-bg);color:var(--text);padding:20px;border-radius:12px;width:90%;max-width:380px}
+        .modal-content input,.modal-content textarea{width:100%;padding:6px;margin:4px 0;border:1px solid #ddd;border-radius:5px;font-size:12px}
+        .date-group{display:flex;gap:6px}.date-group div{flex:1}.date-group label{font-size:9px;color:var(--text-light)}
+        .gender-selection{display:flex;gap:6px;margin:6px 0}.gender-selection button{flex:1;padding:6px;border:2px solid #ddd;border-radius:5px;cursor:pointer;background:#fff;font-weight:600}
+        .gender-selection button.selected{border-color:#4CAF50;background:#e8f5e9}
+        .btn-group{display:flex;gap:6px;margin-top:12px}.btn-group button{flex:1;padding:8px;border:none;border-radius:5px;cursor:pointer;font-weight:700}
+        .btn-save{background:#4CAF50;color:#fff}.btn-cancel{background:#eee;color:#333}
+        .back-nav{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#FF5722;color:#fff;padding:6px 16px;border-radius:15px;z-index:90;display:none;cursor:pointer;font-weight:700;font-size:11px}
+        .back-nav.show{display:block}
+        .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--toast-bg);color:var(--toast-color);padding:8px 20px;border-radius:20px;z-index:2000;display:none;font-size:12px}
+        .toast.show{display:block;animation:fi 2s}@keyframes fi{0%{opacity:0}10%{opacity:1}90%{opacity:1}100%{opacity:0}}
+        .hint-mobile{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;padding:4px 10px;border-radius:10px;font-size:9px;pointer-events:none;z-index:50}
+        @media(max-width:768px){.family-title{font-size:20px}.family-subtitle{font-size:24px}.header button{padding:4px 8px;font-size:8px}.person-card{min-width:90px;padding:8px}.photo-container{width:50px;height:50px}.add-btn{width:28px;height:28px;font-size:13px}}
+    </style>
+</head>
+<body>
+<div class="header">
+<div class="header-left">
+<button class="btn-back" id="btnBack" onclick="goBack()">← BACK</button>
+<button class="btn-home" onclick="goHome()">🏠</button>
+<button class="btn-add" onclick="addRoot()">+ Root</button>
+<button class="btn-demo" onclick="loadDemo()">Demo</button>
+<button class="btn-export" onclick="exportTree()">Export</button>
+<button class="btn-import" onclick="document.getElementById('ifile').click()">Import</button>
+<button class="btn-img" onclick="exportAsImage()">📸 Image</button>
+<button class="btn-clear" onclick="clearTree()">Clear</button>
+<button class="btn-lock" id="btnLock" onclick="toggleLock()">🔒 Lock</button>
+<button class="btn-dark" onclick="toggleDark()">🌙</button>
+<span class="lock-indicator" id="lockIndicator">🔓 unlocked</span>
+<input type="file" id="ifile" accept=".json" style="display:none" onchange="importTree(event)">
+</div>
+<div class="title-box"><div class="family-title">✦ The Daaboul Family Tree ✦</div><div class="family-subtitle">شجرة عائلة الدعبول</div></div>
+<div class="color-palette" id="cpalette"></div>
+</div>
+<div class="back-nav" id="backNav" onclick="goBack()">◄ BACK TO MAIN TREE</div>
+<div class="tree-wrapper" id="tw"><div class="tree-container" id="tc"></div></div>
+<div class="hint-mobile" id="hintMobile">📱 Drag to move | Pinch to zoom | Tap person for lineage</div>
+<div class="modal" id="modal"><div class="modal-content"><h2 id="mTitle">Add Person</h2>
+<input type="text" id="mName" placeholder="Full Name">
+<div class="date-group"><div><label>Birth</label><input type="date" id="mDob"></div><div><label>Death</label><input type="date" id="mDod"></div></div>
+<div class="date-group"><div><label>Marriage</label><input type="date" id="mMarriage"></div></div>
+<div><label>Notes</label><textarea id="mNotes"></textarea></div>
+<div class="gender-selection"><button id="mMale" class="selected" onclick="selGender('male')">♂ Male</button><button id="mFemale" onclick="selGender('female')">♀ Female</button></div>
+<input type="file" id="mPhoto" accept="image/*" onchange="prevPhoto(event)"><div id="mPreview"></div>
+<div class="btn-group"><button class="btn-cancel" onclick="closeModal()">Cancel</button><button class="btn-save" onclick="savePerson()">💾 Save</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var MT, FT, FoT=null, isF=false;
+var z=1, tX=0, tY=0, isP=false, sX=0, sY=0, iTX=0, iTY=0;
+var locked=false, darkMode=false;
+var mA=null, mU=null, sG="male", pD=null, mDate="", mNotes="";
+
+var colors=[["#667eea","#764ba2"],["#2E7D32","#1B5E20"],["#fc4a1a","#f7b733"],["#00b4db","#0083b0"],["#ee0979","#ff6a00"],["#348f50","#56b4d3"],["#b24592","#f15f79"],["#2c3e50","#3498db"]];
+(function(){
+    var cp=document.getElementById("cpalette");
+    colors.forEach(function(c,i){
+        var d=document.createElement("div"); d.className="color-dot"+(i===0?" active":"");
+        d.style.background="linear-gradient(135deg,"+c[0]+","+c[1]+")";
+        d.onclick=function(){ document.querySelectorAll(".color-dot").forEach(x=>x.classList.remove("active")); this.classList.add("active"); setBg(c[0],c[1]); };
+        cp.appendChild(d);
+    });
+})();
+function setBg(c1,c2){ document.documentElement.style.setProperty("--bg1",c1); document.documentElement.style.setProperty("--bg2",c2); }
+
+// Small fallback default (shown only if daaboul.json is missing)
+function buildDefaultTree(){
+    MT = {
+        id: "root",
+        person1: { name: "Jamil Daaboul", dob: "1925-05-10", dod: "1998-03-20", gender: "male", photo: null, notes: "" },
+        person2: { name: "Nazira Daaboul", dob: "1928-03-15", dod: "2005-11-08", gender: "female", photo: null, notes: "" },
+        marriageDate: "1950-06-15",
+        children: [
+            { id: "c1", person1: { name: "Joseph Daaboul", dob: "1950-01-01", dod: "2010-07-15", gender: "male", photo: null, notes: "Doctor" }, person2: { name: "Marie Daaboul", dob: "1952-06-20", gender: "female", photo: null, notes: "Teacher" }, marriageDate: "1972-04-10", children: [] },
+            { id: "c2", person1: { name: "Maurice Daaboul", dob: "1955-08-12", gender: "male", photo: null, notes: "Businessman" }, person2: null, children: [], marriageDate: "" },
+            { id: "c3", person1: { name: "Georgette Daaboul", dob: "1958-02-28", dod: "2020-01-10", gender: "female", photo: null, notes: "Grandmother" }, person2: null, children: [], marriageDate: "" }
+        ]
+    };
+    FT = MT; isF = false;
+}
+
+// Load tree from JSON file automatically
+function loadTree(){
+    fetch('daaboul.json')
+    .then(function(response){ return response.json(); })
+    .then(function(data){
+        MT = data;
+        FT = MT; isF = false;
+        render();
+    })
+    .catch(function(){
+        // If JSON file isn't found, use the small default
+        buildDefaultTree();
+        render();
+    });
+}
+
+function render(){ var c=document.getElementById("tc"); if(!FT){c.innerHTML='';return;} c.innerHTML=''; c.appendChild(rfu(FT,0)); at(); }
+function rfu(u,gen){
+    var d=document.createElement("div"); d.className="family-unit";
+    var p1=u.person1, hs=!!u.person2, isf=p1.gender==="female";
+    var r=document.createElement("div"); r.className=hs?"couple-row":"single-row";
+    r.appendChild(rc(p1,u.id,"person1",gen));
+    if(hs){ var cn=document.createElement("div"); cn.className="spouse-connector"; cn.innerHTML='💍'; if(u.marriageDate) cn.innerHTML+='<div style="font-size:8px;color:#e91e63">'+fd(u.marriageDate)+'</div>'; r.appendChild(cn); r.appendChild(rc(u.person2,u.id,"person2",gen)); }
+    else if(!isf&&!locked){ var b=document.createElement("button"); b.className="add-btn"; b.innerHTML="💍+"; b.onclick=function(e){e.stopPropagation();addSpouse(u.id)}; r.appendChild(b); }
+    d.appendChild(r);
+    var cs=document.createElement("div"); cs.className="children-section";
+    if(u.children&&u.children.length>0){ var cl=document.createElement("div"); cl.className="children-connector"; cs.appendChild(cl); var cr=document.createElement("div"); cr.className="children-row"; u.children.forEach(ch=>{ var cw=document.createElement("div"); cw.className="child-wrapper"; cw.appendChild(rfu(ch,gen+1)); cr.appendChild(cw); }); cs.appendChild(cr); }
+    d.appendChild(cs);
+    if((!isf||hs)&&!locked){ var ar=document.createElement("div"); ar.style.textAlign="center"; if(u.children&&u.children.length>0){ var mc=document.createElement("div"); mc.style.cssText="width:2px;height:16px;background:#bbb;margin:0 auto"; ar.appendChild(mc); } var ab=document.createElement("button"); ab.className="add-btn"; ab.textContent="+"; ab.onclick=function(e){e.stopPropagation();addChild(u.id)}; ar.appendChild(ab); if(!u.children||u.children.length===0){ var lb=document.createElement("div"); lb.style.cssText="font-size:8px;color:#999;margin-top:2px"; lb.textContent="add child"; ar.appendChild(lb); } d.appendChild(ar); }
+    return d;
+}
+function rc(p,uid,pos,gen){
+    var c=document.createElement("div"); c.className="person-card "+p.gender;
+    c.addEventListener("click",function(e){ if(e.target.closest(".photo-container")||e.target.closest("button")) return; var u=findUnit(uid,isF?FoT:MT); if(u&&u.person1===p) focusOn(uid); });
+    var b=document.createElement("div"); b.className="gender-badge "+p.gender; b.textContent=p.gender==="male"?"♂":"♀"; c.appendChild(b);
+    if(p.dod){ var db=document.createElement("div"); db.className="deceased-badge"; db.textContent="✝"; c.appendChild(db); }
+    var pc=document.createElement("div"); pc.className="photo-container"+(p.dod?" deceased":"");
+    if(p.photo){ var img=document.createElement("img"); img.src=p.photo; pc.appendChild(img); }
+    else { var np=document.createElement("div"); np.className="no-photo"; np.textContent="📷"; pc.appendChild(np); }
+    c.appendChild(pc);
+    var nm=document.createElement("div"); nm.className="name"; nm.textContent=p.name; c.appendChild(nm);
+    if(p.dob||p.dod){ var dt=document.createElement("div"); dt.className="dates"; dt.textContent=(p.dob?fd(p.dob):"?")+" - "+(p.dod?fd(p.dod):"Present"); c.appendChild(dt); }
+    if(!locked){ var ac=document.createElement("div"); ac.className="actions"; var eb=document.createElement("button"); eb.textContent="✏️"; eb.onclick=function(e){e.stopPropagation();editPerson(uid,pos)}; ac.appendChild(eb); var dl=document.createElement("button"); dl.textContent="🗑"; dl.onclick=function(e){e.stopPropagation();deletePerson(uid,pos)}; ac.appendChild(dl); c.appendChild(ac); }
+    return c;
+}
+function findUnit(id,root){ if(!root) return null; if(root.id===id) return root; if(root.children) for(var i=0;i<root.children.length;i++){ var f=findUnit(id,root.children[i]); if(f) return f; } return null; }
+function findParent(id,root){ if(!root||!root.children) return null; for(var i=0;i<root.children.length;i++){ if(root.children[i].id===id) return root; var f=findParent(id,root.children[i]); if(f) return f; } return null; }
+function focusOn(uid){ var u=findUnit(uid,MT); if(!u) return; FoT=JSON.parse(JSON.stringify(u)); FT=FoT; isF=true; z=1;tX=0;tY=0; document.getElementById("btnBack").style.display="inline-block"; document.getElementById("backNav").classList.add("show"); render(); }
+function goBack(){ FT=MT; isF=false; FoT=null; z=1;tX=0;tY=0; document.getElementById("btnBack").style.display="none"; document.getElementById("backNav").classList.remove("show"); render(); }
+function goHome(){ loadTree(); }  // re-read the JSON and start fresh
+function fd(d){ if(!d) return ""; return new Date(d+"T00:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}); }
+function at(){ document.getElementById("tc").style.transform="translate("+tX+"px, "+tY+"px) scale("+z+")"; }
+
+function st(m){ var t=document.getElementById("toast"); t.textContent=m; t.className="toast show"; setTimeout(function(){t.className="toast"},2000); }
+function gid(){ return "id_"+Date.now()+"_"+Math.random().toString(36).substr(2,9); }
+function toggleDark(){ darkMode=!darkMode; document.body.classList.toggle("dark-mode",darkMode); document.querySelector(".btn-dark").textContent=darkMode?"☀️":"🌙"; localStorage.setItem("darkMode",darkMode?"1":"0"); st(darkMode?"Dark mode on":"Light mode on"); }
+(function(){ if(localStorage.getItem("darkMode")==="1"){ darkMode=true; document.body.classList.add("dark-mode"); document.querySelector(".btn-dark").textContent="☀️"; } })();
+function exportAsImage(){ if(!MT){ st("Nothing to export!"); return; } st("Rendering image..."); html2canvas(document.getElementById("tw"),{backgroundColor:null,scale:2}).then(function(canvas){ var link=document.createElement("a"); link.download="daaboul-family-tree.png"; link.href=canvas.toDataURL("image/png"); link.click(); st("Image downloaded!"); }).catch(function(){ st("Failed."); }); }
+function updateLockUI(){ document.getElementById("lockIndicator").textContent=locked?"🔒 locked":"🔓 unlocked"; document.getElementById("lockIndicator").style.background=locked?"#ffcccc":"#ccffcc"; }
+function toggleLock(){ if(locked){ var pass=prompt("Password:"); if(pass==="daaboul2024"){ locked=false; document.getElementById("btnLock").textContent="🔒 Lock"; updateLockUI(); st("Unlocked"); } else if(pass!==null) st("Wrong!"); } else { locked=true; document.getElementById("btnLock").textContent="🔓 Unlock"; updateLockUI(); st("Locked"); } }
+function openModal(t,a,uid){ if(locked){ st("Tree is locked"); return; } document.getElementById("mTitle").textContent=t; document.getElementById("mName").value=""; document.getElementById("mDob").value=""; document.getElementById("mDod").value=""; document.getElementById("mMarriage").value=""; document.getElementById("mNotes").value=""; document.getElementById("mPhoto").value=""; document.getElementById("mPreview").innerHTML=""; pD=null; mDate=""; mNotes=""; sG="male"; document.getElementById("mMale").className="selected"; document.getElementById("mFemale").className=""; mA=a; mU=uid||null; document.getElementById("modal").classList.add("active"); }
+function closeModal(){ document.getElementById("modal").classList.remove("active"); }
+function selGender(g){ sG=g; document.getElementById("mMale").className=g==="male"?"selected":""; document.getElementById("mFemale").className=g==="female"?"selected":""; }
+function prevPhoto(e){ var f=e.target.files[0]; if(f){ var r=new FileReader(); r.onload=function(ev){ pD=ev.target.result; document.getElementById("mPreview").innerHTML='<img src="'+pD+'" style="width:50px;height:50px;border-radius:50%">'; }; r.readAsDataURL(f); } }
+function savePerson(){ if(locked) return; var n=document.getElementById("mName").value.trim(); var dob=document.getElementById("mDob").value; var dod=document.getElementById("mDod").value; mDate=document.getElementById("mMarriage").value; mNotes=document.getElementById("mNotes").value.trim(); if(!n){ alert("Enter name"); return; } var p={name:n,dob:dob,dod:dod,gender:sG,photo:pD,notes:mNotes}; var tt=isF?FoT:MT; switch(mA){ case"addRoot": MT={id:gid(),person1:p,person2:null,children:[],marriageDate:""}; FT=MT; break; case"addSpouse": var su=findUnit(mU,tt); if(su){ su.person2=p; if(mDate) su.marriageDate=mDate; } break; case"addChild": var pu=findUnit(mU,tt); if(pu){ if(!pu.children) pu.children=[]; pu.children.push({id:gid(),person1:p,person2:null,children:[],marriageDate:""}); } break; case"editPerson1": var eu1=findUnit(mU,tt); if(eu1){ eu1.person1=p; if(mDate) eu1.marriageDate=mDate; } break; case"editPerson2": var eu2=findUnit(mU,tt); if(eu2){ eu2.person2=p; if(mDate) eu2.marriageDate=mDate; } break; } if(!isF) FT=MT; else FT=FoT; closeModal(); render(); st("Saved!"); }
+window.addRoot=function(){ openModal("Add Root Person","addRoot"); };
+window.addSpouse=function(uid){ openModal("Add Spouse","addSpouse",uid); };
+window.addChild=function(uid){ openModal("Add Child","addChild",uid); };
+window.editPerson=function(uid,pos){ var tt=isF?FoT:MT; var u=findUnit(uid,tt); if(!u) return; var p=pos==="person1"?u.person1:u.person2; if(!p) return; openModal("Edit Person",pos==="person1"?"editPerson1":"editPerson2",uid); document.getElementById("mName").value=p.name; document.getElementById("mDob").value=p.dob||""; document.getElementById("mDod").value=p.dod||""; document.getElementById("mMarriage").value=u.marriageDate||""; document.getElementById("mNotes").value=p.notes||""; selGender(p.gender); if(p.photo){ pD=p.photo; document.getElementById("mPreview").innerHTML='<img src="'+p.photo+'" style="width:50px;height:50px;border-radius:50%">'; } };
+window.deletePerson=function(uid,pos){ if(locked) return; if(!confirm("Delete?")) return; var tt=isF?FoT:MT; var u=findUnit(uid,tt); if(!u) return; if(pos==="person2"){ u.person2=null; } else { if(u===tt){ MT=null; FT=null; } else { var p=findParent(uid,tt); if(p&&p.children) p.children=p.children.filter(function(c){ return c.id!==uid; }); } } if(!isF) FT=MT; else FT=FoT; render(); st("Deleted"); };
+window.loadDemo=function(){ loadTree(); st("Reloaded from file"); };
+window.exportTree=function(){ if(!MT){ st("Nothing!"); return; } var d=JSON.stringify(MT,null,2); var b=new Blob([d],{type:"application/json"}); var u=URL.createObjectURL(b); var a=document.createElement("a"); a.href=u; a.download="daaboul.json"; a.click(); URL.revokeObjectURL(u); st("Exported!"); };
+window.importTree=function(e){ var f=e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(ev){ try{ MT=JSON.parse(ev.target.result); FT=MT; isF=false; render(); st("Imported!"); } catch(err){ st("Invalid file!"); } }; r.readAsText(f); e.target.value=""; };
+window.clearTree=function(){ if(locked) return; if(!MT) return; if(confirm("Clear all?")){ MT=null; FT=null; isF=false; render(); st("Cleared"); } };
+
+var tw=document.getElementById("tw");
+tw.addEventListener("mousedown",function(e){ if(e.target.closest("button")||e.target.closest("input")) return; isP=true; sX=e.clientX; sY=e.clientY; iTX=tX; iTY=tY; tw.style.cursor="grabbing"; e.preventDefault(); });
+window.addEventListener("mousemove",function(e){ if(!isP) return; tX=iTX+(e.clientX-sX); tY=iTY+(e.clientY-sY); at(); });
+window.addEventListener("mouseup",function(){ isP=false; tw.style.cursor="grab"; });
+tw.addEventListener("wheel",function(e){ e.preventDefault(); var d=e.deltaY>0?-0.05:0.05; z=Math.max(0.3,Math.min(2,z+d)); at(); },{passive:false});
+tw.addEventListener("touchstart",function(e){ if(e.target.closest("button")||e.target.closest("input")||e.touches.length!==1) return; isP=true; sX=e.touches[0].clientX; sY=e.touches[0].clientY; iTX=tX; iTY=tY; });
+tw.addEventListener("touchmove",function(e){ if(!isP||e.touches.length!==1) return; tX=iTX+(e.touches[0].clientX-sX); tY=iTY+(e.touches[0].clientY-sY); at(); });
+tw.addEventListener("touchend",function(){ isP=false; });
+document.getElementById("modal").addEventListener("click",function(e){ if(e.target===this) closeModal(); });
+
+loadTree();
+</script>
+</body>
+</html>
