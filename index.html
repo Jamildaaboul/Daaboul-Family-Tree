@@ -148,8 +148,14 @@
         <div class="family-subtitle">شجرة عائلة الدعبول</div>
     </div>
     <div class="header-right">
-        <div class="color-palette" id="cpalette"></div>
+    <div class="color-palette" id="cpalette"></div>
+    <div class="zoom-controls" style="display:flex;gap:3px;background:rgba(255,255,255,0.7);padding:3px 6px;border-radius:8px;margin-left:6px;">
+        <button onclick="zoomOut()" style="padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-weight:700;font-size:12px;background:#fff;color:#333;">−</button>
+        <span id="zl" style="font-size:10px;font-weight:700;min-width:30px;text-align:center;color:#333;">100%</span>
+        <button onclick="zoomIn()" style="padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-weight:700;font-size:12px;background:#fff;color:#333;">＋</button>
+        <button onclick="zoomReset()" style="padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-weight:700;font-size:12px;background:#fff;color:#333;">↺</button>
     </div>
+</div>
 </div>
 <div class="back-nav" id="backNav" onclick="goBack()">◄ BACK TO MAIN TREE</div>
 <div class="tree-wrapper" id="tw"><div class="tree-container" id="tc"></div></div>
@@ -177,7 +183,10 @@ var mA=null, mU=null, sG="male", pD=null, mDate="", mNotes="";
 var colors=[["#667eea","#764ba2"],["#2E7D32","#1B5E20"],["#fc4a1a","#f7b733"],["#00b4db","#0083b0"],["#ee0979","#ff6a00"],["#348f50","#56b4d3"],["#b24592","#f15f79"],["#2c3e50","#3498db"]];
 (function(){var cp=document.getElementById("cpalette");colors.forEach(function(c,i){var d=document.createElement("div");d.className="color-dot"+(i===0?" active":"");d.style.background="linear-gradient(135deg,"+c[0]+","+c[1]+")";d.onclick=function(){document.querySelectorAll(".color-dot").forEach(x=>x.classList.remove("active"));this.classList.add("active");setBg(c[0],c[1])};cp.appendChild(d)})})();
 function setBg(c1,c2){document.documentElement.style.setProperty("--bg1",c1);document.documentElement.style.setProperty("--bg2",c2);}
-
+// Zoom functions
+window.zoomIn = function(){ if(z < 2){ z += 0.1; at(); } };
+window.zoomOut = function(){ if(z > 0.3){ z -= 0.1; at(); } };
+window.zoomReset = function(){ z = 1; tX = 0; tY = 0; at(); };
 // ===== DEFAULT TREE (small family – guaranteed to work) =====
 function buildDefaultTree(){
     MT = {
