@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Daaboul Family Tree – Minimal Test</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;overflow:hidden}
+        .tree-wrapper{width:100vw;height:100vh;overflow:hidden;cursor:grab;position:relative}
+        .tree-container{position:absolute;padding:40px;transform-origin:0 0}
+        .family-unit{display:flex;flex-direction:column;align-items:center}
+        .couple-row,.single-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.95);padding:12px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.1)}
+        .person-card{text-align:center;padding:10px;border-radius:10px;min-width:120px;border:4px solid #FFD700;background:linear-gradient(135deg,#e3f2fd,#bbdefb)}.person-card.female{background:linear-gradient(135deg,#fce4ec,#f8bbd0)}
+        .person-card .name{font-weight:700;font-size:14px;color:#333}.person-card .dates{font-size:10px;color:#666}
+        .children-section{display:flex;flex-direction:column;align-items:center;margin-top:8px}
+        .children-connector{width:2px;height:25px;background:#888}
+        .children-row{display:flex;gap:16px;position:relative;padding-top:25px}
+        .children-row::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#888}
+        .child-wrapper{position:relative}.child-wrapper::before{content:'';position:absolute;top:-25px;left:50%;width:2px;height:25px;background:#888}
+        .gender-badge{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+        .gender-badge.male{background:#2196F3}.gender-badge.female{background:#e91e63}
+        .deceased-badge{position:absolute;top:3px;right:3px;font-size:12px}
+        .spouse-connector{font-size:18px;text-align:center}
+    </style>
+</head>
+<body>
+<div class="tree-wrapper" id="tw"><div class="tree-container" id="tc"></div></div>
+
+<script>
+// FULL FAMILY DATA
+var FT = {
+    id: "root",
+    person1: { name: "Jamil Daaboul", dob: "1925-05-10", dod: "1998-03-20", gender: "male", photo: null, notes: "" },
+    person2: { name: "Nazira Daaboul", dob: "1928-03-15", dod: "2005-11-08", gender: "female", photo: null, notes: "" },
+    marriageDate: "1950-06-15",
+    children: [
+        {
+            id: "c1",
+            person1: { name: "Joseph Daaboul", dob: "1950-01-01", dod: "2010-07-15", gender: "male", photo: null, notes: "Doctor" },
+            person2: { name: "Marie Daaboul", dob: "1952-06-20", gender: "female", photo: null, notes: "Teacher" },
+            marriageDate: "1972-04-10",
+            children: [
+                { id: "c1a", person1: { name: "Paul Daaboul", dob: "1975-03-10", gender: "male", photo: null, notes: "Engineer" }, person2: null, children: [], marriageDate: "" },
+                { id: "c1b", person1: { name: "Rita Daaboul", dob: "1978-08-22", gender: "female", photo: null, notes: "Artist" }, person2: null, children: [], marriageDate: "" }
+            ]
+        },
+        {
+            id: "c2",
+            person1: { name: "Maurice Daaboul", dob: "1955-08-12", gender: "male", photo: null, notes: "Businessman" },
+            person2: null,
+            children: [],
+            marriageDate: ""
+        },
+        {
+            id: "c3",
+            person1: { name: "Georgette Daaboul", dob: "1958-02-28", dod: "2020-01-10", gender: "female", photo: null, notes: "Grandmother" },
+            person2: null,
+            children: [],
+            marriageDate: ""
+        }
+    ]
+};
+var z=1,tX=0,tY=0;
+
+function rfu(u,g){var d=document.createElement("div");d.className="family-unit";var p1=u.person1,hs=!!u.person2,isf=p1.gender==="female";var r=document.createElement("div");r.className=hs?"couple-row":"single-row";r.appendChild(rc(p1));if(hs){var cn=document.createElement("div");cn.className="spouse-connector";cn.innerHTML='💍';r.appendChild(cn);r.appendChild(rc(u.person2))}d.appendChild(r);var cs=document.createElement("div");cs.className="children-section";if(u.children&&u.children.length>0){var cl=document.createElement("div");cl.className="children-connector";cs.appendChild(cl);var cr=document.createElement("div");cr.className="children-row";u.children.forEach(function(ch){var cw=document.createElement("div");cw.className="child-wrapper";cw.appendChild(rfu(ch,g+1));cr.appendChild(cw)});cs.appendChild(cr)}d.appendChild(cs);return d}
+function rc(p){var c=document.createElement("div");c.className="person-card "+(p.gender==="female"?"female":"");var b=document.createElement("div");b.className="gender-badge "+p.gender;b.textContent=p.gender==="male"?"♂":"♀";c.appendChild(b);if(p.dod){var db=document.createElement("div");db.className="deceased-badge";db.textContent="✝";c.appendChild(db)}var nm=document.createElement("div");nm.className="name";nm.textContent=p.name;c.appendChild(nm);if(p.dob||p.dod){var dt=document.createElement("div");dt.className="dates";dt.textContent=(p.dob?new Date(p.dob+"T00:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}):"?")+" - "+(p.dod?new Date(p.dod+"T00:00:00").toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}):"Present");c.appendChild(dt)}return c}
+
+var tc=document.getElementById("tc");
+tc.innerHTML="";
+tc.appendChild(rfu(FT,0));
+tc.style.transform="translate(0px, 0px) scale(1)";
+
+// Simple drag
+var tw=document.getElementById("tw"),isP=!1,sX=0,sY=0,iTX=0,iTY=0;
+tw.addEventListener("mousedown",function(e){if(e.target.closest("button"))return;isP=!0;sX=e.clientX;sY=e.clientY;iTX=tX;iTY=tY;tw.style.cursor="grabbing"});
+window.addEventListener("mousemove",function(e){if(!isP)return;tX=iTX+(e.clientX-sX);tY=iTY+(e.clientY-sY);tc.style.transform="translate("+tX+"px, "+tY+"px) scale("+z+")"});
+window.addEventListener("mouseup",function(){isP=!1;tw.style.cursor="grab"});
+tw.addEventListener("wheel",function(e){e.preventDefault();var d=e.deltaY>0?-0.05:0.05;z=Math.max(0.3,Math.min(2,z+d));tc.style.transform="translate("+tX+"px, "+tY+"px) scale("+z+")"},{passive:!1});
+</script>
+</body>
+</html>
